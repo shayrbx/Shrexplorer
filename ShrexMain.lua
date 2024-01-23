@@ -4221,11 +4221,11 @@ function Utilities.ConvertTable(Data)
 		end
 		
 		if Type == "function" then
-			if getinfo and pcall(getinfo, Value) then
-				return tostring(Value) .. " | " .. getinfo(Value).name
-			else
+			--[[if debug.getinfo and pcall(debug.getinfo, Value) then
+				return tostring(Value) .. " | " .. debug.getinfo(Value).name
+			else]]
 				return tostring(Value)
-			end
+			--end
 		end
 		
 		if Type == "userdata" then
@@ -4290,7 +4290,7 @@ function Utilities.ConvertTable(Data)
 		if typeof(i) == "number" then
 			Key = string.format("[%s] = ", i)
 		else
-			Key = string.format("[\"%s\"] = ", i)
+			Key = string.format("[%s] = ", ConvertData(i))
 		end
 		
 		Result ..= string.format("%s%s%s,\n", string.rep("\t", Indent), Key, ConvertData(v))
@@ -4492,64 +4492,70 @@ return Utilities end,
 			"InvokeServer"
 		}
 
-		local Old; Old = hookmetamethod(game, "__namecall", newcclosure(function(Self, ...)
+		local Old; Old = hookmetamethod(game, "__namecall", newcclosure(function(...)
+            local Self, Args = ..., {select(2, ...)}
+
 			if table.find(Methods, getnamecallmethod()) then
 				local Info = {}
 				local Level = 0
 
-				while true do
+				--[[while true do
 					if pcall(getfenv, Level) then
-						table.insert(Info, {if getinfo and debug.validlevel(Level) then getinfo(Level) else debug.info(Level, "slnaf")})
+						table.insert(Info, {if debug.getinfo and pcall(debug.validlevel, Level) then debug.getinfo(Level) else debug.info(Level, "slnaf")})
 						Level += 1
 					else
 						break
 					end
-				end
+				end]]
 
-				Utilities.AddRemote(Self, Info, ...)
+				Utilities.AddRemote(Self, Info, unpack(Args))
 			end
 
-			return Old(Self, ...)
+			return Old(...)
 		end))
 
-		local OldFire; OldFire = hookfunction(Instance.new("RemoteEvent").FireServer, newcclosure(function(Self, ...)
+		local OldFire; OldFire = hookfunction(Instance.new("RemoteEvent").FireServer, newcclosure(function(...)
+            local Self, Args = ..., {select(2, ...)}
+
 			if typeof(Self) == "Instance" and Self.IsA(Self, "RemoteEvent") then
 				local Info = {}
 				local Level = 0
 
-				while true do
+				--[[while true do
 					if pcall(getfenv, Level) then
-						table.insert(Info, {if getinfo and debug.validlevel(Level) then getinfo(Level) else debug.info(Level, "slnaf")})
+						table.insert(Info, {if debug.getinfo and pcall(debug.validlevel, Level) then debug.getinfo(Level) else debug.info(Level, "slnaf")})
 						Level += 1
 					else
 						break
 					end
-				end
+				end]]
 
-				Utilities.AddRemote(Self, Info, ...)
+				Utilities.AddRemote(Self, Info, unpack(Args))
 			end	
 
-			return OldFire(Self, ...)
+			return OldFire(...)
 		end))
 
-		local OldInvoke; OldInvoke = hookfunction(Instance.new("RemoteFunction").InvokeServer, newcclosure(function(Self, ...)
+		local OldInvoke; OldInvoke = hookfunction(Instance.new("RemoteFunction").InvokeServer, newcclosure(function(...)
+            local Self, Args = ..., {select(2, ...)}
+
 			if typeof(Self) == "Instance" and Self.IsA(Self, "RemoteFunction") then
 				local Info = {}
 				local Level = 0
 
-				while true do
+				--[[while true do
 					if pcall(getfenv, Level) then
-						table.insert(Info, {if getinfo and debug.validlevel(Level) then getinfo(Level) else debug.info(Level, "slnaf")})
+						table.insert(Info, {if debug.getinfo and pcall(debug.validlevel, Level) then debug.getinfo(Level) else debug.info(Level, "slnaf")})
 						Level += 1
 					else
 						break
 					end
-				end
+				end]]
 
-				Utilities.AddRemote(Self, Info, ...)
+				Utilities.AddRemote(Self, Info, unpack(Args))
 			end	
 
-			return OldInvoke(Self, ...)
+			return OldInvoke(...)
 		end)) 
 	else
 		local Proxy = newproxy(true)
